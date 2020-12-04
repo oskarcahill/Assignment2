@@ -22,6 +22,9 @@ app.post('/query', (request, response) => {
   AWS = require("aws-sdk");
   AWS.config.update({
     region: "us-east-1"
+    aws_access_key_id: "ASIAWMLBO3VO77V63LOZ"
+    aws_secret_access_key: "W6DoR0Ekk73cg6SeLngvPgeMWq4f0RxlTodcgTGF"
+    aws_session_token: "FwoGZXIvYXdzEF0aDE5s5SxAbfEtJ0W1EyK+AX7IKoU5DoL63Y/S5puPXumQXqSsIW7skDDboqtXI44QV9fxKCs1xjll/L5DUhCdQCOfbyJApA5vIEXdFm0r5L/prisyU5ReGHmNAReLIC2FU2bqMQD6gFQMrsqaFiCezJDw60YiK9DBEl2lFUoNOWxS0PyzjUP6txmACrjBz9RGVIFv4R166KlT0hDnr6qgdKA43rGTk+ZljRUaTy/LJU4NuS3/Vv30zMR+ui7kBmq6DSn2eiC/QzEIs7l8LngovsWo/gUyLWzVCn5OphPzpjHN6tMAF90qZzOV9zndtY1F0vOaKjvvHUPuXTcG5bidM3+75Q=="
     //endpoint: "http://localhost:8000"
   });
   var docClientQ = new AWS.DynamoDB.DocumentClient();

@@ -2,31 +2,22 @@ const express = require('express')
 const fetch = require('node-fetch')
 const app = express()
 const port = 3000
-var data = null
-var AWS = null
-var s3 = null
-var dynamodb = null
 var params = null
-var docClient = null
 app.listen(3000, () => console.log('listening at 3000'))
 app.use(express.static('public'));
 app.use(express.json());
 
+var AWS = require("aws-sdk")
+AWS.config.update({
+  region: "us-east-1",
+  endpoint: AWS.config.update({endpoint: "https://dynamodb.us-east-1.amazonaws.com"})
+})
+var dynamodb = new AWS.DynamoDB();
+
 app.post('/query', (request, response) => {
-  console.log("This is the movie name:",JSON.stringify(request.body.query.movieName.Data))
-  console.log("This is the movie year:",request.body.query.movieYear.Data)
   var yearAsString = request.body.query.movieYear.Data
-  console.log(typeof yearAsString)
   yearInt = parseInt(yearAsString,10)
 
-  AWS = require("aws-sdk");
-  AWS.config.update({
-    region: "us-east-1"
-    aws_access_key_id: "ASIAWMLBO3VO77V63LOZ"
-    aws_secret_access_key: "W6DoR0Ekk73cg6SeLngvPgeMWq4f0RxlTodcgTGF"
-    aws_session_token: "FwoGZXIvYXdzEF0aDE5s5SxAbfEtJ0W1EyK+AX7IKoU5DoL63Y/S5puPXumQXqSsIW7skDDboqtXI44QV9fxKCs1xjll/L5DUhCdQCOfbyJApA5vIEXdFm0r5L/prisyU5ReGHmNAReLIC2FU2bqMQD6gFQMrsqaFiCezJDw60YiK9DBEl2lFUoNOWxS0PyzjUP6txmACrjBz9RGVIFv4R166KlT0hDnr6qgdKA43rGTk+ZljRUaTy/LJU4NuS3/Vv30zMR+ui7kBmq6DSn2eiC/QzEIs7l8LngovsWo/gUyLWzVCn5OphPzpjHN6tMAF90qZzOV9zndtY1F0vOaKjvvHUPuXTcG5bidM3+75Q=="
-    //endpoint: "http://localhost:8000"
-  });
   var docClientQ = new AWS.DynamoDB.DocumentClient();
   var params = {
     TableName: "Movies",
@@ -62,18 +53,10 @@ app.get('/create', (request,response) =>{
     status: "success"
   })
 
-  AWS = require("aws-sdk");
-  AWS.config.update({
-    region: "us-east-1"
-    //endpoint: "http://localhost:8000"
-  });
-
+  var s3 = new AWS.S3();
+  var docClient = new AWS.DynamoDB.DocumentClient();
   
-  s3 = new AWS.S3();
-  docClient = new AWS.DynamoDB.DocumentClient();
-  dynamodb = new AWS.DynamoDB();
-  
-    params = {
+  params = {
       TableName : "Movies",
       KeySchema: [       
           { AttributeName: "year", KeyType: "HASH"},  //Partition key
@@ -128,15 +111,6 @@ app.get('/create', (request,response) =>{
 })
 
 app.get('/delete', (request, response) =>{
-  var AWS = require("aws-sdk")
-
-  AWS.config.update({
-    region: "us-east-1",
-    //endpoint: "http://localhost:8000"
-  })
-
-  var dynamodb = new AWS.DynamoDB();
-
   var params = {
     TableName: "Movies"
   }

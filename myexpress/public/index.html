@@ -1,0 +1,85 @@
+<html>
+<head>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+
+
+<div id="app">
+    <h1>Welcome to the movie app - please select option or enter a query</h1>
+    <button v-on:click="CreateDatabase">Create Database</button>
+    <button v-on:click="GetMovie">Query Database</button>
+    <button v-on:click="DestroyDatabase">Destroy Database</button>
+    <p>Enter Movie name / query</p><p><input v-model="message"></p><p>{{ message }}</p>
+    <p>Enter Movie year</p><p><input v-model="message_second"><p>{{ message_second }}</p></p>
+    <br>
+    <br>
+    <p>{{ movieNames }}</p>
+    <p>{{ movieYear }}</p>
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            message: "Movie name",
+            message_second: 25,
+            movieNames: [],
+            movieYear: [],
+        },
+        methods: {
+            CreateDatabase: function(){
+                /*This should cause node.js server to make a 
+                table in a DynamoDB database - fetch the raw 
+                data from the S3 object and upload it to the 
+                newly created database. */
+                console.log("test")
+                fetch('/create')
+                .then(response => response.json())
+                .then(response => {
+                //console.log(response)
+                this.responseAvailable = true
+                this.result = response
+                })
+            },
+            GetMovie: function(){
+                const data = { Data: this.message }
+                const data_second = {Data: this.message_second}
+                const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: {
+                        movieName: data,
+                        movieYear: data_second
+                    }
+                })
+                }
+                fetch('/query',options).then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    this.movieNames = []
+                    this.movieYear = []
+                    var count = parseInt(response.Count)
+                    for(i = 0; i < response.Count; i++){
+                        this.movieNames.push(response.Data.Items[i].title)
+                        this.movieYear.push(response.Data.Items[i].year)
+                    }
+                    //this.movieName = response.Data.Items[0].title
+                    //this.movieYear = response.Count
+                })
+            }, 
+            DestroyDatabase: function(){
+                fetch('/delete').then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                })
+            }
+        }
+    })
+
+</script>
+</body>
+</html>
